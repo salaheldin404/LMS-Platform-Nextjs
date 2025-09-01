@@ -17,7 +17,7 @@ const LoginPage = () => {
             // priority
           />
         </div>
-        <div className=" md:w-1/2 lg:w-[calc(50%-100px)]">
+        <div className=" md:w-1/2 lg:w-[calc(50%-200px)]">
           <h1 className="text-center mb-6 font-semibold text-2xl md:text-3xl">
             Sign in to your account
           </h1>

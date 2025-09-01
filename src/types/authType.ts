@@ -20,3 +20,9 @@ export type TAuthSignup = {
   confirmPassword?: string;
   username: string;
 };
+
+export type ActionState = {
+  error?: string | null;
+  message?: string | null;
+  status: string;
+};

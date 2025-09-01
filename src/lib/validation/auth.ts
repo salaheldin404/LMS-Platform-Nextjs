@@ -20,3 +20,23 @@ export const signupSchema = z
     message: "Passwords don't match",
     path: ["confirmPassword"],
   });
+
+export const forgetPasswordSchema = z.object({
+  email: z.string().email({ message: "Please enter a valid email address" }),
+});
+
+export const resetPasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, { message: "Password must be at least 8 characters" })
+      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
+        message:
+          "Password must include at least one uppercase letter, one lowercase letter, and one number.",
+      }),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });

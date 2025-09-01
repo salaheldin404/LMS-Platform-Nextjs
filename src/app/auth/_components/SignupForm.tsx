@@ -1,31 +1,27 @@
 "use client";
-import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Form } from "@/components/ui/form";
 import { signupSchema } from "@/lib/validation/auth";
-import { Button } from "@/components/ui/button";
 
-import { useSignupMutation } from "@/lib/store/features/authApiSlice";
-import { useRouter } from "next/navigation";
 import useFormFields from "@/hooks/useFormFields";
 
-import type { TApiError } from "@/types/apiError";
-import { IFormField } from "@/types";
+import { SignupFormValues } from "@/types/form";
+import DynamicFormField from "./DynamicFormFIeld";
+import { useTransition, useActionState } from "react";
+import { ActionState } from "@/types/authType";
+import { signup } from "@/server/actions/auth";
+import SubmitButton from "./SubmitButton";
 
-type SignupFormValues = z.infer<typeof signupSchema>;
+const initial: ActionState = {
+  error: null,
+  status: "",
+  message: "",
+};
 
 const SignupForm = () => {
-  const [signup, { isLoading, error }] = useSignupMutation();
-  const router = useRouter();
+  const [state, action] = useActionState(signup, initial);
+  const [isPending, startTransition] = useTransition();
 
   const { getFormFields } = useFormFields({ slug: "signupPage" });
   const formFields = getFormFields();
@@ -41,53 +37,33 @@ const SignupForm = () => {
   });
 
   const onSubmit = async (data: SignupFormValues) => {
-    try {
-      const response = await signup(data).unwrap();
-      router.push("/dashboard");
-      console.log(response, "signup response");
-    } catch (error) {
-      console.log(error, "erorr from signup");
-    }
+    const formData = new FormData();
+    formData.append("username", data.username);
+    formData.append("email", data.email);
+    formData.append("password", data.password);
+    formData.append("confirmPassword", data.confirmPassword);
+    startTransition(() => {
+      action(formData);
+    });
   };
-
-  const renderFormField = (field: IFormField) => (
-    <FormField
-      key={field.name}
-      control={form.control}
-      name={field.name as keyof SignupFormValues}
-      render={({ field: formField }) => (
-        <FormItem>
-          <FormLabel htmlFor={field.name}>{field.label}</FormLabel>
-          <FormControl>
-            <Input
-              {...formField}
-              id={field.name}
-              type={field.type}
-              autoComplete={field.autoComplete}
-              aria-label={field.name}
-              placeholder={field.placeholder}
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  );
 
   return (
     <Form {...form}>
       <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
-        {formFields.map(renderFormField)}
-        {error && (
-          <p className="text-red-700">{(error as TApiError).message}</p>
-        )}
-        <Button
-          disabled={isLoading}
-          className="bg-primary w-full"
-          type="submit"
-        >
-          Create Account
-        </Button>
+        {formFields.map((field) => (
+          <DynamicFormField
+            key={field.name}
+            control={form.control}
+            fieldConfig={field}
+          />
+        ))}
+        {state.error && <div className="text-red-500">{state.error}</div>}
+
+        <SubmitButton
+          defaultText="Sign Up"
+          pendingText="Signing Up"
+          isPending={isPending}
+        />
       </form>
     </Form>
   );

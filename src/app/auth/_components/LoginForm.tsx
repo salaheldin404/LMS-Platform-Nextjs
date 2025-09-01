@@ -1,37 +1,32 @@
 "use client";
-import * as z from "zod";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Form } from "@/components/ui/form";
 import { loginSchema } from "@/lib/validation/auth";
-import { Button } from "@/components/ui/button";
 
 import useFormFields from "@/hooks/useFormFields";
 
 import { login as loginAction } from "@/server/actions/auth";
 
-import { useActionState, useCallback } from "react";
-import { useFormStatus } from "react-dom";
+import { useActionState, useTransition } from "react";
 
-import { IFormField } from "@/types";
+import Link from "next/link";
+import type { ActionState } from "@/types/authType";
+import SubmitButton from "./SubmitButton";
+import DynamicFormField from "./DynamicFormFIeld";
 
-type LoginFormValues = z.infer<typeof loginSchema>;
+import type { LoginFormValues } from "@/types/form";
 
-const initial = {
+const initial: ActionState = {
   error: null,
   status: "",
+  message: "",
 };
 
 const LoginForm = () => {
   const [state, action] = useActionState(loginAction, initial);
+  const [isPending, startTransition] = useTransition();
   const { getFormFields } = useFormFields({
     slug: "loginPage",
   });
@@ -45,55 +40,34 @@ const LoginForm = () => {
     },
   });
 
-  // Create a separate submit button component
-  const SubmitButton = () => {
-    const { pending } = useFormStatus(); // Now this is inside the form
-
-    return (
-      <Button disabled={pending} className="bg-primary w-full" type="submit">
-        {pending ? "Signing in..." : "Sign in"}
-      </Button>
-    );
+  const onSubmit = async (data: LoginFormValues) => {
+    const formData = new FormData();
+    formData.append("email", data.email);
+    formData.append("password", data.password);
+    startTransition(() => {
+      action(formData);
+    });
   };
-
-  // Render form field
-  const renderFormField = useCallback(
-    (field: IFormField) => (
-      <FormField
-        key={field.name}
-        control={form.control}
-        name={field.name as keyof LoginFormValues}
-        render={({ field: formField }) => (
-          <FormItem>
-            <FormLabel htmlFor={field.name}>{field.label}</FormLabel>
-            <FormControl>
-              <Input
-                {...formField}
-                id={field.name}
-                type={field.type}
-                autoComplete={field.autoComplete}
-                aria-label={field.name}
-                placeholder={field.placeholder}
-                required
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-    ),
-    [form.control]
-  );
 
   return (
     <Form {...form}>
-      <form className="space-y-5" action={action}>
-        {formFields.map(renderFormField)}
+      <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
+        {formFields.map((field) => (
+          <DynamicFormField
+            key={field.name}
+            control={form.control}
+            fieldConfig={field}
+          />
+        ))}
         {state.error && <div className="text-red-500">{state.error}</div>}
-        <SubmitButton />
-        {/* <Button disabled={pending} className="bg-primary w-full" type="submit">
-          {pending ? "Signing in..." : "Sign in"}
-        </Button> */}
+        <Link href="/auth/forget-password" className="text-primary w-fit block">
+          Forgot Password
+        </Link>
+        <SubmitButton
+          pendingText="Signing in..."
+          defaultText="Sign in"
+          isPending={isPending}
+        />
       </form>
     </Form>
   );
