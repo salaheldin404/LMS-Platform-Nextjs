@@ -29,15 +29,12 @@ interface IProps {
 const AuthButton = ({ session }: IProps) => {
   const { data: currentSession } = useClientSession(session);
   const dispatch = useAppDispatch();
-  const router = useRouter();
+
   const handleLogout = async () => {
     try {
       await logout();
       dispatch(logoutAction());
-      router.replace("/auth/login");
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      window.location.href = "/";
     } catch (error) {
       console.log(error, "error from logout");
     }
