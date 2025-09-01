@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 
 import { useGetSessionQuery } from "@/lib/store/features/authApiSlice";
 import { IUser } from "@/types/user";
@@ -8,24 +8,20 @@ import { useAppDispatch } from "@/lib/store/hooks";
 import { login } from "@/lib/store/auth-slice";
 export const useClientSession = (initialSession: IUser | null) => {
   const { data, isLoading } = useGetSessionQuery();
-  const [currentSession, setCurrentSession] = useState<IUser | null>(
-    initialSession
-  );
+
   const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    const session = data ?? initialSession;
-    setCurrentSession(session);
-    if (session) {
-      dispatch(login(session));
-    }
-  }, [data, initialSession, dispatch]);
+  const currentSession = useMemo(() => {
+    // Server data takes precedence over initial session
+    if (data !== undefined) return data;
+    return initialSession;
+  }, [data, initialSession]);
 
   useEffect(() => {
-    if (initialSession) {
-      setCurrentSession(initialSession);
+    if (currentSession) {
+      dispatch(login(currentSession));
     }
-  }, [initialSession]);
+  }, [currentSession, dispatch]);
 
   return { data: currentSession, isLoading };
 };

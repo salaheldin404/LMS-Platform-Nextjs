@@ -1,8 +1,9 @@
+import { IUser } from "@/types/user";
 import Navbar from "./Navbar";
 
 import { getActiveSession } from "@/server/actions/auth";
 const Header = async () => {
-  let session = null;
+  let session: IUser | null = null;
 
   try {
     session = await getActiveSession();

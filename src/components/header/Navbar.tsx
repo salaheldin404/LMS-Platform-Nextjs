@@ -13,28 +13,59 @@ import { ModeToggle } from "../mode-toggle";
 import { IUser } from "@/types/user";
 import { useAppSelector } from "@/lib/store/hooks";
 
+import {
+  clearCartFromStorage,
+  loadCartFromStorage,
+} from "@/lib/store/cart-slice";
+import { useCart } from "@/hooks/useCart";
+import { useWishlist } from "@/hooks/useWishlist";
+
 interface IProps {
   session: IUser | null;
 }
 
 const Navbar = ({ session }: IProps) => {
+  const [isClient, setIsClient] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
   const pathname = usePathname();
   const { items: cart } = useAppSelector((state) => state.cart);
+  const { addCourseToCart } = useCart();
+  const { wishlistData } = useWishlist();
 
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
   useEffect(() => {
     setNavOpen(false);
   }, [pathname]);
 
+  useEffect(() => {
+    const syncLocalCartToDatabase = async () => {
+      if (!session) return;
+      const localCart = loadCartFromStorage();
+      if (localCart.length == 0) return;
+      try {
+        await Promise.all(
+          localCart.map(async (item) => {
+            try {
+              await addCourseToCart(item);
+            } catch (error) {
+              console.log(`Failed to sync item ${item._id}:`, error);
+            }
+          })
+        );
+        clearCartFromStorage();
+      } catch (error) {
+        console.log(error, "error from sync cart");
+      }
+    };
+
+    syncLocalCartToDatabase();
+  }, [session, addCourseToCart]);
   const handleNavOpenChange = (isOpen: boolean) => {
     setNavOpen(isOpen);
   };
 
-  // const shouldHide = [
-  //   ...["/auth", "/instructor",'/course/create'].map((prefix) => pathname.startsWith(prefix)),
-  //   ["/setting"].includes(pathname),
-  // ].some(Boolean);
-  // if (shouldHide) return null;
   return (
     <>
       <nav className="hidden lg:block bg-card px-4 border-b">
@@ -58,7 +89,7 @@ const Navbar = ({ session }: IProps) => {
         <div className="flex items-center gap-4 md:gap-8 ">
           <Link href="/">
             <Image
-              src={"/new-logo.png"}
+              src={"/logo.png"}
               className="rounded-full"
               width={70}
               height={70}
@@ -79,12 +110,29 @@ const Navbar = ({ session }: IProps) => {
         <div className="hidden lg:flex items-center gap-6">
           <ModeToggle />
           <div className="icons flex items-center gap-4">
-            <Heart />
-            <Bell />
+            {session && (
+              <>
+                <div className="relative">
+                  <Link
+                    href="/student/wishlist"
+                    className="absolute inset-0 z-10"
+                  />
+                  <Heart />
+                  {isClient && wishlistData && wishlistData.length > 0 && (
+                    <span className="absolute w-6 h-6 top-[-10px] right-[-10px] grid place-content-center bg-primary text-white font-semibold text-xs px-[5px] rounded-full">
+                      {wishlistData.length}
+                    </span>
+                  )}
+                </div>
+
+                <Bell />
+              </>
+            )}
+
             <div className="relative">
               <Link href="/cart" className="absolute inset-0 z-10" />
               <ShoppingCart />
-              {cart.length > 0 && (
+              {isClient && cart.length > 0 && (
                 <span className="absolute w-6 h-6 top-[-10px] right-[-10px] grid place-content-center bg-primary text-white font-semibold text-xs px-[5px] rounded-full">
                   {cart.length}
                 </span>
@@ -103,6 +151,7 @@ const Navbar = ({ session }: IProps) => {
         <MobileNav
           navOpen={navOpen}
           onClose={() => handleNavOpenChange(false)}
+          session={session}
         />
       </nav>
     </>

@@ -1,6 +1,6 @@
 import { Input } from "../ui/input";
 
-interface SearchInputProps extends React.ComponentProps<typeof Input> {}
+type SearchInputProps = React.ComponentProps<typeof Input>;
 
 const SearchInput = (props: SearchInputProps) => {
   return (
