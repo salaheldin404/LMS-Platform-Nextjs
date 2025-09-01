@@ -2,7 +2,7 @@ import SectionWrapper from "./SectionWrapper";
 import DynamicStarRating from "@/components/course/DynamicStarRating";
 import RatingProgress from "@/components/course/RatingProgress";
 import ReviewsList from "./ReviewsList";
-import type { IRating, TRatingPercentage } from "@/types/course";
+import type { TRatingPercentage } from "@/types/course";
 
 interface FeedbackSectionProps {
   ratingsSummary: { averageRating: number; totalRatings: number };
@@ -37,7 +37,7 @@ const FeedbackSection = ({
           {[5, 4, 3, 2, 1].map((rating) => (
             <RatingProgress
               key={rating}
-              rating={rating}
+              rating={rating.toString()}
               percentage={ratingPercentage?.[rating].percentage}
             />
           ))}

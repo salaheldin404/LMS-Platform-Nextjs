@@ -30,7 +30,7 @@ interface ReviewItemProps {
 
 const ReviewItem = ({ review, searchQuery }: ReviewItemProps) => {
   const user = useAppSelector((state) => state.auth.user);
-  const isOwn = user._id === review.user._id;
+  const isOwn = user?._id === review.user._id;
   // Apply highlighting if searchQuery exists, otherwise use the plain comment
   const highlightedComment = searchQuery
     ? highlightMatch(review.comment, searchQuery)

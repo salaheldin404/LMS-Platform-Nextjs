@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import PreviewDialog from "./PreviewDialog";
@@ -15,15 +15,20 @@ import {
 } from "react-icons/fa";
 import { FiFileText, FiDownload, FiSmartphone } from "react-icons/fi";
 import { GoTrophy } from "react-icons/go";
-import { useAppSelector, useAppDispatch } from "@/lib/store/hooks";
-import { addItemToCart } from "@/lib/store/cart-slice";
+
+// import { addItemToCart } from "@/lib/store/cart-slice";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
+import { useCart } from "@/hooks/useCart";
+import { toast } from "sonner";
+import useCourseStatus from "@/hooks/useCourseStatus";
+import { useAppSelector } from "@/lib/store/hooks";
+import WishlistButton from "@/components/course/WishlistButton";
 const CourseFeatureCard = ({ course }: { course: ICourse }) => {
+  const { addCourseToCart, error, isAddingToCart } = useCart();
+
+  const { hasAccess, isCourseInCart } = useCourseStatus(course._id);
   const user = useAppSelector((state) => state.auth.user);
-  const cart = useAppSelector((state) => state.cart.items);
-  const dispatch = useAppDispatch();
-  const router = useRouter();
   const [showPreviewDialog, setShowPreviewDialog] = useState(false);
 
   const firstUnlockedLesson = useMemo(() => {
@@ -31,35 +36,21 @@ const CourseFeatureCard = ({ course }: { course: ICourse }) => {
       ?.flatMap((chapter) => chapter.lessons)
       .find((lesson) => !lesson.locked);
   }, [course]);
-  const isEnrolled = useMemo(() => {
-    return user?.enrolledCourses?.some(
-      (id) => id.toString() === course._id.toString()
-    );
-  }, [user, course]);
-  const isCreator = useMemo(() => {
-    return user?.createdCourses?.some(
-      (id) => id.toString() === course._id.toString()
-    );
-  }, [user, course]);
-  const hasAccess = useMemo(
-    () => isEnrolled || isCreator,
-    [isEnrolled, isCreator]
-  );
-  const isCourseInCart = useMemo(() => {
-    return cart.some((item) => item._id.toString() === course._id.toString());
-  }, [cart, course]);
-
-  const handleAddToCart = () => {
+  const firstLesson = course?.chapters?.[0]?.lessons[0];
+  const handleAddToCart = async () => {
     if (isCourseInCart) {
       return;
     }
 
-    dispatch(addItemToCart(course));
+    await addCourseToCart(course);
   };
 
-  // const handleGoToCart = () => {
-  //   router.push("/cart");
-  // };
+  useEffect(() => {
+    if (error) {
+      console.log(error);
+      toast.error((error as Error).message);
+    }
+  }, [error]);
 
   return (
     <>
@@ -101,7 +92,7 @@ const CourseFeatureCard = ({ course }: { course: ICourse }) => {
             {hasAccess ? (
               <Link
                 className="w-full mb-3 py-3 text-white text-lg bg-primary block rounded text-center"
-                href={`/course/${course.slug}/learn/lecture/${firstUnlockedLesson?._id}`}
+                href={`/course/${course.slug}/learn/lecture/${firstLesson?._id}`}
               >
                 Go to course
               </Link>
@@ -110,25 +101,28 @@ const CourseFeatureCard = ({ course }: { course: ICourse }) => {
                 Enroll Now
               </Button>
             )}
-            {!hasAccess && !isCourseInCart && (
-              <Button
-                variant="outline"
-                className="w-full mb-6 py-6 text-lg"
-                onClick={handleAddToCart}
-              >
-                Add to Cart
-              </Button>
-            )}
-            {isCourseInCart && (
-              <Button
-                variant="outline"
-                className="w-full mb-6 py-6 text-lg relative"
-              >
-                <Link href="/cart" className="absolute inset-0 z-10" />
-                Go to Cart
-              </Button>
-            )}
-
+            <div className="flex items-center gap-3 mb-4">
+              {!hasAccess && !isCourseInCart && (
+                <Button
+                  variant="outline"
+                  className="w-full  py-6 text-lg"
+                  onClick={handleAddToCart}
+                  disabled={isAddingToCart}
+                >
+                  {isAddingToCart ? "Adding..." : "Add to Cart"}
+                </Button>
+              )}
+              {isCourseInCart && (
+                <Button
+                  variant="outline"
+                  className="w-full  py-6 text-lg relative"
+                >
+                  <Link href="/cart" className="absolute inset-0 z-10" />
+                  Go to Cart
+                </Button>
+              )}
+              {!hasAccess && user && <WishlistButton course={course} />}
+            </div>
             <div className="text-center text-sm text-slate-500 mb-6">
               30-Day Money-Back Guarantee
               <br />

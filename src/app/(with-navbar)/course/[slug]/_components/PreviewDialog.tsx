@@ -1,6 +1,6 @@
 "use client";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { ICourse, ILesson } from "@/types/course";
+import { ICourse, ILesson, IVideo } from "@/types/course";
 import { useEffect, useMemo, useState } from "react";
 
 import ReactPlayer from "react-player"; // Import react-player
@@ -19,7 +19,7 @@ const PreviewDialog = ({
   currentLesson,
 }: PreviewDialogProps) => {
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
-
+  const videoData = currentLesson?.video as IVideo;
   const previewLessons = useMemo(() => {
     if (!course?.chapters) return [];
     const allLessons = course.chapters.flatMap((chapter) => chapter.lessons);
@@ -53,7 +53,7 @@ const PreviewDialog = ({
         {/* Video Player */}
         <div className="relative w-full aspect-video  flex items-center justify-center">
           <ReactPlayer
-            url={activeLesson?.video.playbackUrl}
+            url={videoData.playbackUrl}
             controls={true}
             width="100%"
             height="auto"

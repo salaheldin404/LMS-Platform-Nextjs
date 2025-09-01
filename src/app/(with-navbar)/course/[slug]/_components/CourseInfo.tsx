@@ -1,8 +1,7 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { TbUsers } from "react-icons/tb";
 import { FaStar, FaCalendarAlt } from "react-icons/fa";
 import { ICourse } from "@/types/course";
-import Link from "next/link";
+import InstructorInfo from "@/components/course/InstructorInfo";
 const CourseInfo = ({ course }: { course: ICourse }) => {
   return (
     <div className="mb-6">
@@ -32,9 +31,9 @@ const CourseInfo = ({ course }: { course: ICourse }) => {
           {new Date(course.updatedAt).toLocaleDateString()}
         </div>
       </div>
-
+      <InstructorInfo instructor={course.instructor} />
       {/* Instructor info */}
-      <div className="flex items-center gap-3">
+      {/* <div className="flex items-center gap-3">
         <Link href={`/profile/${course.instructor._id}`}>
           <Avatar className="h-10 w-10 border border-slate-600">
             <AvatarImage
@@ -53,7 +52,7 @@ const CourseInfo = ({ course }: { course: ICourse }) => {
             <p className="font-medium">{course.instructor.username}</p>
           </Link>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
