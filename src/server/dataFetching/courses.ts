@@ -36,22 +36,22 @@ import { revalidatePath, revalidateTag } from "next/cache";
 // };
 
 export async function getAllCourses(
-  filterParams: ICourseFilterParams
+  filterParams?: ICourseFilterParams
 ): Promise<PaginateResponse<ICourse>> {
   const queryParams = new URLSearchParams();
 
   // Add each filter to query params
-  Object.entries(filterParams).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== "") {
-      if (Array.isArray(value)) {
-        value.forEach((val) => queryParams.append(key, String(val)));
-      } else {
-        queryParams.append(key, String(value));
+  if (filterParams) {
+    Object.entries(filterParams).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        if (Array.isArray(value)) {
+          value.forEach((val) => queryParams.append(key, String(val)));
+        } else {
+          queryParams.append(key, String(value));
+        }
       }
-    }
-  });
-
-  console.log(queryParams.toString(), "from client ---");
+    });
+  }
 
   return apiClient(`/courses?${queryParams.toString()}`);
 }

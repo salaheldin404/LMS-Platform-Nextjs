@@ -13,6 +13,7 @@ export class APIError extends Error {
 async function performFetch<T>(
   url: string,
   options: RequestInit,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   transformResponse?: (responseData: any) => T
 ): Promise<T> {
   const response = await fetch(url, options);
@@ -28,6 +29,50 @@ async function performFetch<T>(
   }
 
   return transformResponse ? transformResponse(data) : (data as T);
+}
+async function getNewAccessToken(
+  refreshToken: string | undefined
+): Promise<string> {
+  if (!refreshToken) {
+    // This case is handled in the main function, but serves as a safeguard.
+    throw new Error("No refresh token available for token refresh.");
+  }
+
+  try {
+    const refreshResponse = await fetch(`${API_URL}/auth/refreshToken`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken }),
+      credentials: "include",
+    });
+
+    const refreshData = await refreshResponse.json();
+
+    if (!refreshResponse.ok) {
+      // The refresh token itself is likely invalid or expired.
+      // The user needs to log in again.
+      throw new APIError(
+        refreshResponse.status,
+        refreshData.message || "Session expired. Please log in again."
+      );
+    }
+
+    // Correctly access the new token from the response payload.
+    // Based on the previous review, the token is in `accessToken`.
+    const newAccessToken = refreshData.accessToken;
+    if (!newAccessToken) {
+      throw new Error(
+        "New access token was not found in the refresh response."
+      );
+    }
+
+    return newAccessToken;
+  } catch (error) {
+    console.error("Token refresh failed:", error);
+    // Rethrow a consistent error to be handled by the caller.
+    // This indicates the end of the user's session.
+    throw new Error("Your session has expired. Please log in again.");
+  }
 }
 
 export async function apiClient<T>(
@@ -58,22 +103,23 @@ export async function apiClient<T>(
     if (error instanceof APIError && error.statusCode === 401) {
       console.log("unAuthorized expire token");
       try {
-        const refreshResponse = await fetch(`${API_URL}/auth/refreshToken`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ refreshToken }),
-          credentials: "include",
-        });
-        console.log("trying to refresh token");
-        const refreshData = await refreshResponse.json();
-        if (!refreshResponse.ok) {
-          console.log("Failed to refresh token", refreshData);
-          throw new APIError(
-            refreshResponse.status,
-            refreshData.message || "Token refresh failed"
-          );
-        }
-        const newAccessToken = refreshData.data;
+        // const refreshResponse = await fetch(`${API_URL}/auth/refreshToken`, {
+        //   method: "POST",
+        //   headers: { "Content-Type": "application/json" },
+        //   body: JSON.stringify({ refreshToken }),
+        //   credentials: "include",
+        // });
+        // console.log("trying to refresh token");
+        // const refreshData = await refreshResponse.json();
+        // if (!refreshResponse.ok) {
+        //   console.log("Failed to refresh token", refreshData);
+        //   throw new APIError(
+        //     refreshResponse.status,
+        //     refreshData.message || "Token refresh failed"
+        //   );
+        // }
+        // const newAccessToken = refreshData.data;
+        const newAccessToken = await getNewAccessToken(refreshToken);
         headers.set("Authorization", `Bearer ${newAccessToken}`);
         // Retry the original request with the new token
         return await performFetch<T>(url, fetchOptions, transformResponse);
