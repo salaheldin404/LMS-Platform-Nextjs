@@ -1,35 +1,37 @@
 "use client";
 import { useCallback, useMemo } from "react";
 
-import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
-import { clearCart, removeItemFromCart } from "@/lib/store/cart-slice";
-
 import { Button } from "@/components/ui/button";
 
 import EmptyCart from "./EmptyCart";
 import CartItem from "./CartItem";
 import OrderSummary from "./OrderSummary";
+import { useCart } from "@/hooks/useCart";
 
 const CartContent = () => {
-  const { itemCount, items, total } = useAppSelector((state) => state.cart);
-  const dispatch = useAppDispatch();
+  const {
+    cart,
+    removeCourseFromCart,
+    isRemovingFromCart,
+    isClearingCart,
+    handleClearCart,
+  } = useCart();
 
   const handleRemoveItem = useCallback(
-    (id: string) => {
-      dispatch(removeItemFromCart(id));
+    async (id: string) => {
+      await removeCourseFromCart(id);
     },
-    [dispatch]
+    [removeCourseFromCart]
   );
 
-  const handleClearCart = useCallback(() => {
-    dispatch(clearCart());
-  }, [dispatch]);
   // Memoized course text to prevent hydration mismatch
   const courseText = useMemo(() => {
-    return `${itemCount} Course${itemCount !== 1 ? "s" : ""} in Cart`;
-  }, [itemCount]);
+    return `${cart?.itemCount} Course${
+      cart?.itemCount !== 1 ? "s" : ""
+    } in Cart`;
+  }, [cart?.itemCount]);
 
-  if (!items || items.length === 0) {
+  if (!cart || cart.items.length === 0) {
     return <EmptyCart />;
   }
 
@@ -52,6 +54,7 @@ const CartContent = () => {
                   <Button
                     onClick={handleClearCart}
                     className="text-white font-medium text-sm"
+                    disabled={isClearingCart}
                   >
                     Clear all
                   </Button>
@@ -59,11 +62,12 @@ const CartContent = () => {
               </div>
 
               <div className="divide-y">
-                {items.map((item) => (
+                {cart.items.map((item) => (
                   <CartItem
                     key={item._id}
                     item={item}
                     onRemove={handleRemoveItem}
+                    isRemovingFromCart={isRemovingFromCart}
                   />
                 ))}
               </div>
@@ -71,7 +75,7 @@ const CartContent = () => {
           </div>
 
           {/* Order Summary */}
-          <OrderSummary total={total} />
+          <OrderSummary total={cart.total} cartItems={cart.items} />
         </div>
       </div>
     </div>

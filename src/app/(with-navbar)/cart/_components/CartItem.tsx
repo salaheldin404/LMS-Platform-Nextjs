@@ -8,12 +8,20 @@ import { useCallback } from "react";
 
 import { CartCourseItem } from "@/types/course";
 import { formatPrice } from "@/lib/utils";
+import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
+
+import { addItemToWishlist } from "@/lib/store/wishlist-slice";
+import { moveToWishlist } from "@/lib/store/cart-slice";
 
 interface CartItemProps {
   item: CartCourseItem;
   onRemove: (id: string) => void;
+  isRemovingFromCart?: boolean;
 }
-const CartItem = ({ item, onRemove }: CartItemProps) => {
+const CartItem = ({ item, onRemove, isRemovingFromCart }: CartItemProps) => {
+  const user = useAppSelector((state) => state.auth.user);
+  const dispatch = useAppDispatch();
+
   const handleRemoveClick = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
@@ -22,10 +30,18 @@ const CartItem = ({ item, onRemove }: CartItemProps) => {
     },
     [item._id, onRemove]
   );
+
+  const handleMoveToWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dispatch(moveToWishlist(item));
+    dispatch(addItemToWishlist(item));
+  };
+
   return (
     <div key={item._id} className="p-6 bg-card relative shadow-md">
       <Link
-        href={`/course/${item.slug || item._id}`}
+        href={`/course/${item.slug}`}
         className="absolute inset-0 z-10 cursor-pointer"
         aria-label={`View ${item.title} course details`}
       />
@@ -79,24 +95,27 @@ const CartItem = ({ item, onRemove }: CartItemProps) => {
             <div className="flex items-center gap-4">
               <Button
                 onClick={handleRemoveClick}
-                className="flex items-center gap-1 z-20 text-sm font-medium"
+                className="flex items-center gap-1 z-10 text-sm font-medium"
+                disabled={isRemovingFromCart}
               >
                 <LuTrash2 className="w-4 h-4" />
                 Remove
               </Button>
-              <Button
-                // onClick={() => handleMoveToWishlist(item.id)}
-                className="flex items-center gap-1 z-20 text-sm font-medium"
-              >
-                <LuHeart className="w-4 h-4" />
-                Move to Wishlist
-              </Button>
+              {user && (
+                <Button
+                  onClick={handleMoveToWishlist}
+                  className="flex items-center gap-1 z-10 text-sm font-medium"
+                >
+                  <LuHeart className="w-4 h-4" />
+                  Move to Wishlist
+                </Button>
+              )}
             </div>
 
             <div className="text-right">
               <div className="flex items-center gap-2">
                 <span className="text-lg font-bold text-gray-900 dark:text-white">
-                  {formatPrice(item.price)}
+                  {formatPrice(item.price || 0)}
                 </span>
               </div>
             </div>

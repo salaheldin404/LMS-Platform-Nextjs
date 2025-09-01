@@ -8,12 +8,20 @@ interface CartState {
 }
 const CART_STORAGE_KEY = "cart";
 
-const loadCartFromStorage = (): CartCourseItem[] => {
+export const loadCartFromStorage = (): CartCourseItem[] => {
   try {
     const stored = localStorage.getItem(CART_STORAGE_KEY);
     return stored ? JSON.parse(stored) : [];
   } catch {
     return [];
+  }
+};
+
+export const clearCartFromStorage = () => {
+  try {
+    localStorage.removeItem(CART_STORAGE_KEY);
+  } catch (error) {
+    console.warn("Failed to clear cart from localStorage:", error);
   }
 };
 
@@ -27,7 +35,7 @@ const saveCartToStorage = (items: CartCourseItem[]): void => {
 
 // Calculate derived state
 const calculateDerivedState = (items: CartCourseItem[]) => ({
-  total: items.reduce((sum, item) => sum + item.price, 0),
+  total: items.reduce((sum, item) => sum + (item.price || 0), 0),
   itemCount: items.length,
 });
 
@@ -71,10 +79,38 @@ const cartSlice = createSlice({
       state.total = 0;
       saveCartToStorage([]);
     },
+    setCart(state, action: PayloadAction<CartCourseItem[]>) {
+      state.items = action.payload.filter(
+        (id, index, self) => self.indexOf(id) === index
+      );
+      const derivedState = calculateDerivedState(state.items);
+      state.itemCount = derivedState.itemCount;
+      state.total = derivedState.total;
+
+      localStorage.setItem(CART_STORAGE_KEY, "[]");
+    },
+    moveToWishlist: (state, action: PayloadAction<CartCourseItem>) => {
+      const itemIdToMove = action.payload;
+      const itemIndex = state.items.findIndex(
+        (item) => item._id === itemIdToMove._id
+      );
+      if (itemIndex !== -1) {
+        state.items.splice(itemIndex, 1);
+        const derivedState = calculateDerivedState(state.items);
+        state.itemCount = derivedState.itemCount;
+        state.total = derivedState.total;
+        saveCartToStorage(state.items);
+      }
+    },
   },
 });
 
-export const { addItemToCart, removeItemFromCart, clearCart } =
-  cartSlice.actions;
+export const {
+  addItemToCart,
+  removeItemFromCart,
+  clearCart,
+  moveToWishlist,
+  setCart,
+} = cartSlice.actions;
 
 export const cartReducer = cartSlice.reducer;

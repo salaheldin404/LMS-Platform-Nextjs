@@ -1,8 +1,51 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAppSelector } from "@/lib/store/hooks";
 import { formatPrice } from "@/lib/utils";
+import { createCheckoutSession } from "@/server/actions/checkout";
+import { CartCourseItem } from "@/types/course";
+import { loadStripe } from "@stripe/stripe-js";
+import { useCallback, useState } from "react";
 
-const OrderSummary = ({ total }) => {
+interface OrderSummaryProps {
+  total: number;
+  cartItems: CartCourseItem[];
+}
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+);
+const OrderSummary = ({ total, cartItems }: OrderSummaryProps) => {
+  const { user } = useAppSelector((state) => state.auth);
+  const [isLoading, setIsLoading] = useState(false);
+  const handleCheckout = useCallback(async () => {
+    const filteredCartItems = cartItems.map((item) => ({
+      _id: item._id,
+      title: item.title,
+      price: item.price || 0,
+      image: item?.image?.url || "",
+    }));
+
+    try {
+      setIsLoading(true);
+      const { data } = await createCheckoutSession(filteredCartItems);
+
+      if (data) {
+        const stripe = await stripePromise;
+        const redirectResult = await stripe?.redirectToCheckout({
+          sessionId: data.id,
+        });
+        if (redirectResult?.error) {
+          console.error("Stripe redirect error:", redirectResult.error.message);
+        }
+      }
+    } catch (error) {
+      console.error("Error creating checkout session:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [cartItems]);
+
   return (
     <div className="w-full lg:w-80">
       <div className="bg-card rounded-lg shadow-sm border p-6 sticky top-8">
@@ -15,9 +58,15 @@ const OrderSummary = ({ total }) => {
           </div>
         </div>
 
-        <Button className="w-full bg-primary  py-3 px-4 rounded font-medium text-lg mb-3">
-          Checkout
-        </Button>
+        {user && (
+          <Button
+            onClick={handleCheckout}
+            className="w-full mb-3"
+            disabled={isLoading}
+          >
+            {isLoading ? "Processing..." : "Checkout"}
+          </Button>
+        )}
 
         <div className="text-center">
           <p className="text-xs text-gray-500 mb-2">
