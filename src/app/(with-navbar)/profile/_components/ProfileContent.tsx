@@ -18,7 +18,7 @@ const ProfileContent = ({ userId }: { userId: string }) => {
       <ProfileHeader userData={userData} />
       <div className=" flex flex-col lg:flex-row items-start gap-3 mt-5">
         <AboutSection biography={userData?.biography} />
-        <CoursesSection courses={data?.courses} pagination={data?.pagination} />
+        <CoursesSection courses={data?.courses} />
       </div>
     </div>
   );

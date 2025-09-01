@@ -48,7 +48,7 @@ const BasicInformationForm = () => {
   });
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (user) {
       form.reset({
         username: user.username,
         email: user.email,
@@ -57,7 +57,7 @@ const BasicInformationForm = () => {
       });
       setImgPreview(user.profilePicture?.url || null);
     }
-  }, [user, form, isAuthenticated]);
+  }, [user, form]);
 
   const onSubmit = async (data: BasicInformationValues) => {
     if (!user) {
@@ -106,7 +106,7 @@ const BasicInformationForm = () => {
             onSubmit={form.handleSubmit(onSubmit)}
           >
             {getFormFields().map((field) => (
-              <FormInputField
+              <FormInputField<BasicInformationValues>
                 key={field.name}
                 field={field}
                 form={form}

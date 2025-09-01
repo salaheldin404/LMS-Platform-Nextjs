@@ -41,7 +41,7 @@ const SocialLinksForm = () => {
   });
 
   useEffect(() => {
-    if (isAuthenticated && user.socialMedia) {
+    if (isAuthenticated && user?.socialMedia) {
       form.reset({
         github: user.socialMedia.github || "",
         facebook: user.socialMedia.facebook || "",

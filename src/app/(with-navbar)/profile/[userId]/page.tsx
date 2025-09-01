@@ -2,7 +2,6 @@ import ProfileHeader from "../_components/ProfileHeader";
 import AboutSection from "../_components/AboutSection";
 import CoursesSection from "../_components/CoursesSection";
 
-import { CoursesSkeleton } from "@/components/course/CoursesSkeleton";
 import { APIError } from "@/lib/api/client";
 
 import {
@@ -22,7 +21,7 @@ async function CoursesData({ userId }: { userId: string }) {
     return (
       <CoursesSection
         courses={coursesData?.data}
-        pagination={coursesData?.pagination}
+        // pagination={coursesData?.pagination}
       />
     );
   } catch (error) {

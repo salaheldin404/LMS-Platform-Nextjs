@@ -6,7 +6,7 @@ import { DEFAULT_AVATAR } from "@/constants";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 interface IProps {
-  userData: PublicInstructorProfile | null;
+  userData?: PublicInstructorProfile;
 }
 
 const ProfileHeader = ({ userData }: IProps) => {

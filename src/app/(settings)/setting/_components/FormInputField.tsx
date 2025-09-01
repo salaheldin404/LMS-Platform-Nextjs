@@ -9,15 +9,22 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-import { IFormField } from "@/types";
+import { IFormField } from "@/types/form";
+import { FieldValues } from "react-hook-form";
 
-interface IProps {
-  field: IFormField;
+interface IProps<T extends FieldValues> {
+  field: IFormField<T>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   form: any;
   isUpdating?: boolean;
   componentType?: string;
 }
-const FormInputField = ({ field, form, isUpdating, componentType }: IProps) => {
+const FormInputField = <T extends FieldValues>({
+  field,
+  form,
+  isUpdating,
+  componentType,
+}: IProps<T>) => {
   return (
     <FormField
       key={field.name}

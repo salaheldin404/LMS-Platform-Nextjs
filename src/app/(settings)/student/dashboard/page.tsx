@@ -1,4 +1,3 @@
-import { useAppSelector } from "@/lib/store/hooks";
 import { getUserProfile } from "@/server/dataFetching/user";
 import { IoMdPlayCircle } from "react-icons/io";
 import { IoCheckmarkCircle } from "react-icons/io5";
