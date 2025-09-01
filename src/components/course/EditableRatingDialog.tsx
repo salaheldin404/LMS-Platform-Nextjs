@@ -34,7 +34,7 @@ const RatingMessageMap = new Map([
   [5, "Amazing, above expectations!"],
 ]);
 
-const EditableRatingDialog = ({ courseId }) => {
+const EditableRatingDialog = ({ courseId }: { courseId: string }) => {
   const { data } = useGetUserRatingForCourseQuery(courseId);
   const [addRating, { isLoading }] = useAddRatingToCourseMutation();
   const [deleteRating] = useDeleteUserRatingMutation();

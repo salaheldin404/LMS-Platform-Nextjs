@@ -26,7 +26,7 @@ const CourseActions = ({ course }: ICourseActionProps) => {
   // const [open, setOpen] = useState(false);
   const handleDeleteCourse = async () => {
     try {
-      const deletedData = await deleteCourse(course._id);
+      await deleteCourse(course._id);
       toast.success("Course deleted successfully");
       setConfirmationDialog(false);
       // setOpen(false);
@@ -46,7 +46,7 @@ const CourseActions = ({ course }: ICourseActionProps) => {
         // onOpenChange={(open) => setOpen(open)}
         // open={open}
       >
-        <DropdownMenuTrigger asChild>
+        <DropdownMenuTrigger asChild className="lg:px-4 md:px-2">
           <Button variant="ghost" className="">
             <BsThreeDots />
           </Button>

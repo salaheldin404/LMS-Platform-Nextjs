@@ -7,21 +7,15 @@ import {
 import { ICourse, ILesson } from "@/types/course";
 import { MdOutlinePlayCircle } from "react-icons/md";
 import { TfiTimer } from "react-icons/tfi";
-
+import React from "react";
 interface ChapterAccordionProps {
   LessonItem: React.FC<{
     lesson: ILesson;
     course: ICourse;
-    completedLessons?: [];
   }>;
   course?: ICourse;
-  completedLessons: [];
 }
-const ChapterAccordion = ({
-  LessonItem,
-  course,
-  completedLessons,
-}: ChapterAccordionProps) => {
+const ChapterAccordion = ({ LessonItem, course }: ChapterAccordionProps) => {
   return (
     <Accordion type="multiple" className="w-full">
       {course?.chapters?.map((chapter, index) => (
@@ -48,12 +42,7 @@ const ChapterAccordion = ({
           <AccordionContent>
             <div className="divide-y">
               {chapter.lessons.map((lesson) => (
-                <LessonItem
-                  completedLessons={completedLessons}
-                  lesson={lesson}
-                  key={lesson._id}
-                  course={course}
-                />
+                <LessonItem lesson={lesson} key={lesson._id} course={course} />
               ))}
             </div>
           </AccordionContent>

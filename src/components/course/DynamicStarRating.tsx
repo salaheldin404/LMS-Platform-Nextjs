@@ -2,7 +2,7 @@ import { Fragment } from "react";
 import { FaStar, FaRegStar } from "react-icons/fa";
 
 interface DynamicStarRatingProps {
-  rating: number;
+  rating: number | string;
   className?: string;
 }
 const DynamicStarRating = ({ rating, className }: DynamicStarRatingProps) => {
@@ -12,7 +12,7 @@ const DynamicStarRating = ({ rating, className }: DynamicStarRatingProps) => {
     <div className={className || "flex items-center gap-2"}>
       {stars.map((star) => (
         <Fragment key={star}>
-          {star <= rating ? (
+          {star <= +rating ? (
             <FaStar key={star} className={` text-orange-400`} />
           ) : (
             <FaRegStar key={star} className={` text-gray-400`} />

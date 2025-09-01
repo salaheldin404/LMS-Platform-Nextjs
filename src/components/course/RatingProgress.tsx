@@ -1,7 +1,12 @@
 import { Progress } from "@/components/ui/progress";
 
 import DynamicStarRating from "./DynamicStarRating";
-const RatingProgress = ({ rating, percentage }) => {
+
+interface RatingProgressProps {
+  rating: string;
+  percentage: string;
+}
+const RatingProgress = ({ rating, percentage }: RatingProgressProps) => {
   return (
     <div className="flex items-center gap-3">
       <div className="flex items-center gap-2">
