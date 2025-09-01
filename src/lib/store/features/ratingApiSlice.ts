@@ -1,6 +1,6 @@
-import { TApiError } from "@/types/apiError";
 import { apiSlice } from "../services/apiSlice";
 import { IRating, TRatingPercentage } from "@/types/course";
+import { transformApiError } from "@/lib/utils";
 
 export const ratingApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -10,15 +10,7 @@ export const ratingApiSlice = apiSlice.injectEndpoints({
       transformResponse: (response: { data: TRatingPercentage }) => {
         return response.data;
       },
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
+      transformErrorResponse: transformApiError,
     }),
     getUserRatingForCourse: builder.query({
       query: (courseId) => `/ratings/user/${courseId}`,
@@ -28,15 +20,7 @@ export const ratingApiSlice = apiSlice.injectEndpoints({
       }) => {
         return response.data;
       },
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
+      transformErrorResponse: transformApiError,
     }),
     getAllRatingsForCourse: builder.query({
       query: (courseId) => `/ratings/${courseId}`,
@@ -44,15 +28,7 @@ export const ratingApiSlice = apiSlice.injectEndpoints({
       transformResponse: (response: { data: IRating[] }) => {
         return response.data;
       },
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
+      transformErrorResponse: transformApiError,
     }),
     addRatingToCourse: builder.mutation({
       query: ({ rate, courseId, comment }) => ({
@@ -67,15 +43,7 @@ export const ratingApiSlice = apiSlice.injectEndpoints({
           { type: "Ratings", id: "USER_RATING" },
         ];
       },
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
+      transformErrorResponse: transformApiError,
     }),
     deleteUserRating: builder.mutation({
       query: (courseId) => ({
@@ -89,15 +57,7 @@ export const ratingApiSlice = apiSlice.injectEndpoints({
           { type: "Ratings", id: "USER_RATING" },
         ];
       },
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
+      transformErrorResponse: transformApiError,
     }),
   }),
 });

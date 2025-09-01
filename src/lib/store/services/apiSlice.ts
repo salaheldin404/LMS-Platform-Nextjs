@@ -45,7 +45,8 @@ const baseQueryWithReauth: BaseQueryFn<
   return result;
 };
 
-async function handleLogout(api: BaseQueryApi, extraOptions: unknown) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function handleLogout(api: BaseQueryApi, extraOptions: any) {
   const logoutResult = await baseQuery(
     { url: "/auth/logout", method: "POST" }, // Call a logout endpoint to clear cookies
     api,
@@ -61,7 +62,7 @@ async function handleLogout(api: BaseQueryApi, extraOptions: unknown) {
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["User", "Course", "Ratings"],
+  tagTypes: ["User", "Course", "Ratings", "Cart", "Wishlist"],
   keepUnusedDataFor: 40,
   endpoints: () => ({}),
 });

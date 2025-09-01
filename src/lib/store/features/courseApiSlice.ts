@@ -1,6 +1,8 @@
 import { apiSlice } from "../services/apiSlice";
-import type { TApiError } from "@/types/apiError";
+
 import type { ICourse, ICourseStats, TRatingPercentage } from "@/types/course";
+
+import { transformApiError } from "@/lib/utils";
 
 const courseApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -41,15 +43,7 @@ const courseApiSlice = apiSlice.injectEndpoints({
         };
       },
 
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
+      transformErrorResponse: transformApiError,
     }),
     getCourseById: builder.query({
       query: (courseId) => `/courses/${courseId}`,
@@ -62,15 +56,7 @@ const courseApiSlice = apiSlice.injectEndpoints({
       providesTags: (result) =>
         result ? [{ type: "Course", id: result.course._id }] : [],
 
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
+      transformErrorResponse: transformApiError,
     }),
 
     getAllCourses: builder.query({
@@ -82,15 +68,7 @@ const courseApiSlice = apiSlice.injectEndpoints({
         };
       },
       providesTags: [{ type: "Course", id: "LIST" }],
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
+      transformErrorResponse: transformApiError,
     }),
     getCourseStats: builder.query({
       query: (courseId) => `/courses/${courseId}/stats`,
@@ -101,15 +79,7 @@ const courseApiSlice = apiSlice.injectEndpoints({
         return [{ type: "Course", id: courseId }];
       },
 
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
+      transformErrorResponse: transformApiError,
     }),
     getCourseRatingPercentage: builder.query({
       query: (courseId) => `/courses/${courseId}/ratingPercentage`,
@@ -121,15 +91,7 @@ const courseApiSlice = apiSlice.injectEndpoints({
         return [{ type: "Course", id: courseId }];
       },
 
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
+      transformErrorResponse: transformApiError,
     }),
 
     createCourse: builder.mutation({
@@ -141,15 +103,7 @@ const courseApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: () => {
         return [{ type: "User", id: "CURRENT_USER" }];
       },
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
+      transformErrorResponse: transformApiError,
     }),
     updateCourse: builder.mutation({
       query: ({ courseId, data }) => ({
@@ -166,15 +120,7 @@ const courseApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: (result, error, arg) => {
         return [{ type: "Course", id: arg.courseId }];
       },
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
+      transformErrorResponse: transformApiError,
     }),
     publishCourse: builder.mutation({
       query: (courseId) => ({
@@ -185,15 +131,7 @@ const courseApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: (result, error, courseId) => {
         return [{ type: "Course", id: courseId }];
       },
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
+      transformErrorResponse: transformApiError,
     }),
     generateCertificate: builder.mutation({
       query: (courseId) => ({
@@ -203,15 +141,7 @@ const courseApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: () => {
         return [{ type: "User", id: "CURRENT_USER" }];
       },
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
+      transformErrorResponse: transformApiError,
     }),
     // addRatingToCourse: builder.mutation({
     //   query: ({ courseId, rating, comment }) => ({

@@ -1,6 +1,8 @@
-import type { TApiError } from "@/types/apiError";
 import { apiSlice } from "../services/apiSlice";
 import type { PublicInstructorProfile } from "@/types/user";
+
+import { transformApiError } from "@/lib/utils";
+
 export const useApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getUserProfile: builder.query({
@@ -10,15 +12,7 @@ export const useApiSlice = apiSlice.injectEndpoints({
         return response.data;
       },
 
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
+      transformErrorResponse: transformApiError,
     }),
 
     updateProfile: builder.mutation({
@@ -28,16 +22,8 @@ export const useApiSlice = apiSlice.injectEndpoints({
         method: "PATCH",
         body: formData,
       }),
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
       invalidatesTags: [{ type: "User", id: "CURRENT_USER" }],
+      transformErrorResponse: transformApiError,
     }),
     updateUserSocialMedia: builder.mutation({
       query: ({ data, userId }) => ({
@@ -45,16 +31,8 @@ export const useApiSlice = apiSlice.injectEndpoints({
         method: "PATCH",
         body: { socialMedia: data },
       }),
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
       invalidatesTags: [{ type: "User", id: "CURRENT_USER" }],
+      transformErrorResponse: transformApiError,
     }),
     updateUserPassword: builder.mutation({
       query: (data) => ({
@@ -62,28 +40,12 @@ export const useApiSlice = apiSlice.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
       invalidatesTags: [{ type: "User", id: "CURRENT_USER" }],
+      transformErrorResponse: transformApiError,
     }),
     getCertificateForCourse: builder.query({
       query: (courseId) => `/users/me/certificate/${courseId}`,
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
+      transformErrorResponse: transformApiError,
     }),
     getAllCertificatesForUser: builder.query({
       query: () => `/users/me/certificates`,
@@ -103,13 +65,7 @@ export const useApiSlice = apiSlice.injectEndpoints({
       }) => {
         return response.certificates;
       },
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => ({
-        status: response.status,
-        message: response.data.message,
-      }),
+      transformErrorResponse: transformApiError,
     }),
   }),
 });

@@ -1,5 +1,6 @@
-import type { TApiError } from "@/types/apiError";
+import { ILesson } from "@/types/course";
 import { apiSlice } from "../services/apiSlice";
+import { transformApiError } from "@/lib/utils";
 
 export const lessonApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -12,15 +13,13 @@ export const lessonApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: (result, error, { courseId }) => {
         return [{ type: "Course", id: courseId }];
       },
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
+      transformResponse: (response: { data: ILesson; message: string }) => {
         return {
-          status: response.status,
-          message: response.data.message,
+          lesson: response.data,
+          message: response.message,
         };
       },
+      transformErrorResponse: transformApiError,
     }),
     updateLessonOrder: builder.mutation({
       query: ({ lessonIds, chapterId, courseId }) => ({
@@ -31,15 +30,7 @@ export const lessonApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: (result, error, { courseId }) => {
         return [{ type: "Course", id: courseId }];
       },
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
+      transformErrorResponse: transformApiError,
     }),
     deleteLesson: builder.mutation({
       query: ({ lessonId, chapterId, courseId }) => ({
@@ -51,15 +42,7 @@ export const lessonApiSlice = apiSlice.injectEndpoints({
         return [{ type: "Course", id: courseId }];
       },
 
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
+      transformErrorResponse: transformApiError,
     }),
 
     updateLesson: builder.mutation({
@@ -71,15 +54,7 @@ export const lessonApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: (result, error, { courseId }) => {
         return [{ type: "Course", id: courseId }];
       },
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
+      transformErrorResponse: transformApiError,
     }),
   }),
 });

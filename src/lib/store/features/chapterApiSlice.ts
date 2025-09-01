@@ -1,4 +1,4 @@
-import { TApiError } from "@/types/apiError";
+import { transformApiError } from "@/lib/utils";
 import { apiSlice } from "../services/apiSlice";
 
 export const chapterApiSlice = apiSlice.injectEndpoints({
@@ -14,15 +14,7 @@ export const chapterApiSlice = apiSlice.injectEndpoints({
         return [{ type: "Course", id: courseId }];
       },
 
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
+      transformErrorResponse: transformApiError,
     }),
     updateChapter: builder.mutation({
       query: ({ chapterId, title, order }) => ({
@@ -34,15 +26,7 @@ export const chapterApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: (result, error, { courseId }) => {
         return [{ type: "Course", id: courseId }];
       },
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
+      transformErrorResponse: transformApiError,
     }),
     updateChapterOrder: builder.mutation({
       query: ({ chapterIds, courseId }) => ({
@@ -54,16 +38,7 @@ export const chapterApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: (result, error, { courseId }) => {
         return [{ type: "Course", id: courseId }];
       },
-
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
+      transformErrorResponse: transformApiError,
     }),
     deleteChapter: builder.mutation({
       query: (chapterId) => ({
@@ -71,15 +46,7 @@ export const chapterApiSlice = apiSlice.injectEndpoints({
         method: "DELETE",
       }),
 
-      transformErrorResponse: (response: {
-        status: number;
-        data: TApiError;
-      }) => {
-        return {
-          status: response.status,
-          message: response.data.message,
-        };
-      },
+      transformErrorResponse: transformApiError,
     }),
   }),
 });
