@@ -1,3 +1,4 @@
+import { TApiError } from "@/types/apiError";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -11,3 +12,11 @@ export const formatPrice = (price: number) => {
     currency: "USD",
   }).format(price);
 };
+
+export const transformApiError = (response: {
+  status: number;
+  data: TApiError;
+}) => ({
+  status: response.status,
+  message: response.data.message || "Something went wrong",
+});

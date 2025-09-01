@@ -3,11 +3,13 @@ import authSlice from "./auth-slice";
 
 import { apiSlice } from "@/lib/store/services/apiSlice";
 import { cartReducer } from "./cart-slice";
+import { wishlistReducer } from "./wishlist-slice";
 
 const rootReducer = combineReducers({
   [apiSlice.reducerPath]: apiSlice.reducer,
   auth: authSlice,
   cart: cartReducer,
+  wishlist: wishlistReducer,
 });
 
 export const store = configureStore({
