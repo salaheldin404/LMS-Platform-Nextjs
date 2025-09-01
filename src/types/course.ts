@@ -1,6 +1,6 @@
 import type { IUser } from "./user";
 
-interface IVideo {
+export interface IVideo {
   assetId: string;
   playbackId: string;
   playbackUrl: string;
@@ -26,7 +26,7 @@ export interface IChapter {
 export interface ILesson {
   _id: string;
   title: string;
-  video: IVideo;
+  video: IVideo | File | null;
   chapter: string;
   course: string;
   order: number;
@@ -117,8 +117,13 @@ export type TRatingPercentage = Record<
   { percentage: string; count: number }
 >;
 
+export interface LessonComplete {
+  lessonId: string;
+  completionDate: Date;
+}
+
 export interface IUserProgressCourse {
-  completedLessons: [];
+  completedLessons: LessonComplete[];
   progressPercentage: number;
 }
 
