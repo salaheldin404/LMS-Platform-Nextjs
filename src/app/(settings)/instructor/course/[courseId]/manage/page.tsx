@@ -129,8 +129,7 @@ const ManageCoursePage = () => {
     skip: !courseId,
     refetchOnMountOrArgChange: true,
   });
-  const [updateCourse, { error: upadtingError, isLoading: isUpdating }] =
-    useUpdateCourseMutation();
+  const [updateCourse, { isLoading: isUpdating }] = useUpdateCourseMutation();
 
   const router = useRouter();
 
@@ -198,27 +197,38 @@ const ManageCoursePage = () => {
       const dirtyFields: DirtyFields<FormData[typeof tabPart]> =
         formMethods.formState.dirtyFields[tabPart] || {};
       const isTabDirty = Object.keys(dirtyFields).length > 0;
-      const currentValues: FormData[typeof tabPart] =
-        formMethods.getValues(tabPart);
-      const formData = new FormData();
+      // const currentValues: FormData[typeof tabPart] =
+      //   formMethods.getValues(tabPart);
+      // const formData = new FormData();
       if (isTabDirty) {
         // Append only dirty fields to FormData
-        Object.entries(dirtyFields).forEach(([field, isDirty]) => {
-          const typedField = field as keyof FormData[typeof tabPart];
-          if (isDirty && currentValues[typedField] !== undefined) {
-            const value = currentValues[typedField];
-            if (typedField == "thumbnail") {
+        const currentValues = formMethods.getValues(tabPart);
+        const formData = new FormData();
+
+        Object.keys(dirtyFields).forEach((field) => {
+          // Accessing the value via 'any' to bypass TypeScript's inability to resolve
+          // keys on a union type, which was causing the 'never' type error.
+          const value = (currentValues as any)[field];
+
+          if (value !== undefined && value !== null) {
+            if (field === "thumbnail" && value instanceof File) {
               formData.append("image", value);
+            } else if (Array.isArray(value)) {
+              // This logic now safely handles arrays by checking the item structure,
+              // which matches the 'requirements' and 'willLearn' fields.
+              value.forEach((item: unknown) => {
+                if (
+                  item &&
+                  typeof item === "object" &&
+                  "value" in item &&
+                  typeof (item as any).value === "string"
+                ) {
+                  if ((item as any).value)
+                    formData.append(field, (item as any).value);
+                }
+              });
             } else {
-              // handle add requiremnts and willLearn
-              if (Array.isArray(value)) {
-                value.forEach(
-                  (v) => v.value && formData.append(field, v.value)
-                );
-                console.log(value, "value type object");
-              } else {
-                formData.append(typedField, value);
-              }
+              formData.append(field, String(value));
             }
           }
         });
@@ -291,10 +301,10 @@ const ManageCoursePage = () => {
 
   if (error) {
     console.log(error, "error from course data");
-    if (error.status === 404) {
+    if ("status" in error && error.status === 404) {
       return <NotFound />;
     }
-    toast.error(error.message);
+    // toast.error(error.message);
   }
 
   // if (courseLoading) {

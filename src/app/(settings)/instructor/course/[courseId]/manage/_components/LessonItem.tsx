@@ -1,4 +1,4 @@
-import { ILesson } from "@/types/course";
+import { ILesson, IVideo } from "@/types/course";
 import { memo, useMemo, useState } from "react";
 import { FaRegTrashAlt, FaEdit } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa6";
@@ -14,12 +14,15 @@ import DataRemovalConfirmation from "@/components/DataRemovalConfirmation";
 
 interface ILessonProps {
   lesson: ILesson;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   error: any;
   onEdit: (lessonId: string, title: string, locked: boolean) => void;
   onUpload: (lessonId: string, videoFile: File) => void;
   onDelete: (lessonId: string) => void;
 }
-
+const isFile = (video: IVideo | File | null): video is File => {
+  return video instanceof File;
+};
 const LessonItem = memo(
   ({
     lesson,
@@ -31,7 +34,9 @@ const LessonItem = memo(
   }: ILessonProps & { isParentDragging: boolean }) => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [videoDialogOpen, setVideoDialogOpen] = useState(false);
-    const [videoFile, setVideoFile] = useState<File | null>(lesson.video);
+    const [videoFile, setVideoFile] = useState<File | null>(
+      isFile(lesson.video) ? lesson.video : null
+    );
     const [storedVideo, setStoredVideo] = useLocalStorage("videoData", [
       { name: "", _id: "" },
     ]);

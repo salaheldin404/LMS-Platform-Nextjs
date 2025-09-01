@@ -1,4 +1,4 @@
-import type { IChapter } from "@/types/course";
+// import type { IChapter } from "@/types/course";
 import { FaRegTrashAlt, FaEdit } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa6";
 
@@ -8,6 +8,7 @@ import EditSectionDialog from "./EditSectionDialog";
 import AddLessonDialog from "./AddLessonDialog";
 import LessonItem from "./LessonItem";
 import { RxHamburgerMenu } from "react-icons/rx";
+import type { FieldErrors } from "react-hook-form";
 
 import {
   SortableContext,
@@ -15,19 +16,18 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 
-import type { EditLessonParams } from "./CurriculumTab";
+import type { EditLessonParams, ISection } from "./CurriculumTab";
 import DataRemovalConfirmation from "@/components/DataRemovalConfirmation";
 
 interface ISectionProps {
-  section: IChapter;
+  section: ISection;
   onEdit: (sectionId: string, title: string) => void;
   onDelete: (sectionId: string) => void;
   onAddLesson: (sectionId: string, lessonTitle: string) => void;
   onEditLesson: (params: EditLessonParams) => void;
   onDeleteLesson: (sectionId: string, lessonId: string) => void;
   index: number;
-  error: any;
-  updatingChapterState: boolean;
+  error?: FieldErrors<ISection>;
 }
 
 const Section = memo(

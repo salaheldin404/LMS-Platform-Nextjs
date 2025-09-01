@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import React, { useCallback, useMemo, useState } from "react";
@@ -49,12 +50,27 @@ import Loading from "./Loading";
 import Section from "./Section";
 
 import { RxHamburgerMenu } from "react-icons/rx";
+import { TApiError } from "@/types/apiError";
+import { ILesson } from "@/types/course";
 
-// interface ISection {
-//   id: string;
-//   title: string;
-//   lectures: [];
-// }
+interface CirriculumLesson {
+  title: string;
+  _id: string;
+  video:
+    | Partial<{
+        assetId: string;
+        playbackId: string;
+        playbackUrl: string;
+        duration: number;
+      }>
+    | File;
+}
+
+export interface ISection {
+  _id: string;
+  title: string;
+  lessons: ILesson[];
+}
 
 interface DragData {
   sortable: {
@@ -74,10 +90,19 @@ export interface EditLessonParams {
   locked?: boolean;
   attach?: File;
 }
+interface CurriculumFormData {
+  curriculum: {
+    sections: ISection[];
+  };
+}
 
-const debounce = (func: Function, delay: number) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const debounce = <T extends (...args: any[]) => void>(
+  func: T,
+  delay: number
+) => {
   let timeoutId: NodeJS.Timeout;
-  return (...args: any[]) => {
+  return (...args: Parameters<T>) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => func(...args), delay);
   };
@@ -124,7 +149,7 @@ const CurriculumTab = ({ courseId }: IProps) => {
     formState: { errors },
     trigger,
     getValues,
-  } = useFormContext<FormData>();
+  } = useFormContext<CurriculumFormData>();
 
   const {
     fields: sectionsFields,
@@ -209,13 +234,13 @@ const CurriculumTab = ({ courseId }: IProps) => {
       toast.success("Chapter added successfully");
     } catch (error) {
       console.log(error);
-      toast.error(error.message || "Error adding chapter");
+      toast.error((error as TApiError).message || "Error adding chapter");
     }
   };
 
   const debouncedSectionUpdate = useMemo(
     () =>
-      debounce(async (newSections: any[], courseId: string) => {
+      debounce(async (newSections: ISection[], courseId: string) => {
         try {
           const updatedOrderData = await updateChapterOrders({
             chapterIds: newSections.map((section) => section._id),
@@ -232,7 +257,7 @@ const CurriculumTab = ({ courseId }: IProps) => {
   const debouncedLessonUpdate = useMemo(
     () =>
       debounce(
-        async (newLessons: any[], sectionId: string, courseId: string) => {
+        async (newLessons: ILesson[], sectionId: string, courseId: string) => {
           try {
             await updateLessonsOrder({
               lessonIds: newLessons.map((l) => l._id),
@@ -254,7 +279,7 @@ const CurriculumTab = ({ courseId }: IProps) => {
     setActiveId(active.id as string);
 
     const data = active.data.current;
-    setDragData(data);
+    setDragData(data as DragData);
   };
   const handleDragEnd = useCallback(
     async (event: DragEndEvent) => {
@@ -400,13 +425,9 @@ const CurriculumTab = ({ courseId }: IProps) => {
           courseId,
           chapterId: sectionId,
         }).unwrap();
-
         updateSection(sectionIndex, {
           ...getSection,
-          lessons: [
-            ...getSection.lessons,
-            { title: lessonTitle, _id: lessonData.data._id, video: {} as File },
-          ],
+          lessons: [...getSection.lessons, { ...lessonData.lesson }],
         });
         // await trigger(`curriculum.sections.${sectionIndex}.lessons`);
         toast.success(lessonData?.message || "Lesson added successfully");
@@ -478,7 +499,7 @@ const CurriculumTab = ({ courseId }: IProps) => {
           formData.append("title", lessonTitle);
         }
         if (locked !== undefined) {
-          formData.append("locked", locked);
+          formData.append("locked", String(locked));
         }
 
         const updatedLesson = await updateLesson({
@@ -521,7 +542,7 @@ const CurriculumTab = ({ courseId }: IProps) => {
             </Button>
             <p className="flex gap-2">
               <span className="font-normal">
-                Section 0{dragData.sortable.index + 1}:
+                Section {String(dragData.sortable.index + 1).padStart(2, "0")}:
               </span>
               <span className="font-medium">{section.title}</span>
             </p>

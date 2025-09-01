@@ -17,7 +17,6 @@ import { useFormContext } from "react-hook-form";
 import type { FormData } from "../page";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Checkbox } from "@/components/ui/checkbox";
 
 const categories = ["programming", "design", "marketing", "business"];
 const levels = ["beginner", "intermediate", "advanced"];
@@ -246,7 +245,7 @@ const BasicTab = ({ isUpdating }: { isUpdating: boolean }) => {
                   },
                   validate: {
                     positive: (value) =>
-                      value > 0 || "Price must be a positive number",
+                      (value && value > 0) || "Price must be a positive number",
                   },
                 })}
                 id="basic.price"

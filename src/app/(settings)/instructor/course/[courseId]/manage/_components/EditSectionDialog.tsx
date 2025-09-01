@@ -4,15 +4,14 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { useFormContext } from "react-hook-form";
-import type { FormData } from "../page";
+
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface IEditDialogProps {
   initialTitle: string;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (newTitle: string, locked?: boolean) => void;
+  onSave: (newTitle: string, locked: boolean) => void;
   type: "lesson" | "section";
   lessonLocked?: boolean;
 }
@@ -26,7 +25,7 @@ const EditSectionDialog = ({
   lessonLocked,
 }: IEditDialogProps) => {
   const [title, setTitle] = useState(initialTitle);
-  const [locked, setLocked] = useState(lessonLocked);
+  const [locked, setLocked] = useState<boolean>(lessonLocked || true);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
