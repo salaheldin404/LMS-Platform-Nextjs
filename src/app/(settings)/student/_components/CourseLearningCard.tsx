@@ -7,7 +7,7 @@ const CourseLearningCard = memo(({ data }: { data: UserLearningCourse }) => {
   const { course, progressPercentage, _id } = data;
 
   return (
-    <div key={_id} className="relative bg-card rounded border max-w-[350px]">
+    <div key={_id} className="relative bg-card rounded border lg:max-w-[350px]">
       <div className="relative w-full aspect-[16/9] overflow-hidden">
         <Image
           src={course?.image?.url || "/default-course.jpg"}
