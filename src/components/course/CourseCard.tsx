@@ -1,3 +1,6 @@
+"use client";
+import { useMediaQuery } from "@uidotdev/usehooks";
+
 import type { ICourse } from "@/types/course";
 import Image from "next/image";
 import Link from "next/link";
@@ -5,14 +8,14 @@ import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-  HoverCardArrow,
 } from "../ui/hover-card";
 
-import { FaStar, FaRegHeart } from "react-icons/fa";
-
-import { Button } from "../ui/button";
 import CourseDetails from "./CourseDetails";
 import CourseStats from "./CourseStats";
+
+import CardActions from "./CardActions";
+import InstructorInfo from "./InstructorInfo";
+import WishlistButton from "./WishlistButton";
 
 interface IProps {
   course: ICourse;
@@ -20,12 +23,11 @@ interface IProps {
 }
 
 const CourseCard = ({ course, page }: IProps) => {
-  const { averageRatings = 0, totalRatings = 0 } =
-    course.instructor.instructorRating ?? {};
-  const isLargeScreen = false;
+  const isLargeScreen = useMediaQuery("(min-width : 993px)");
+  const shouldShowHover = isLargeScreen && page !== "profile";
 
   const CardContent = () => (
-    <div className="bg-card rounded ">
+    <div className="bg-card rounded  relative">
       <Link href={`/course/${course.slug}`}>
         <div className="relative w-full aspect-[16/9] overflow-hidden ">
           <Image
@@ -42,79 +44,39 @@ const CourseCard = ({ course, page }: IProps) => {
 
       <CourseDetails
         title={course.title}
-        price={course?.price}
+        price={course?.price || 0}
         category={course.category}
       />
-      <CourseStats
-        // averageRating={course.ratingsSummary?.averageRating || 0}
-        // totalRatings={course.ratingsSummary?.totalRatings || 0}
-        // studentCount={course.enrollmentsCount || 0}
-        course={course}
-      />
-      {/* <CourseActions course={course} /> */}
+      <CourseStats course={course} />
+      {!shouldShowHover && (
+        <WishlistButton course={course} className="absolute right-3 top-3" />
+      )}
     </div>
   );
 
-  return isLargeScreen ? (
-    <HoverCard openDelay={400}>
+  if (!shouldShowHover) {
+    return <CardContent />;
+  }
+  return (
+    <HoverCard>
       <HoverCardTrigger asChild>
-        <CardContent />
+        <div>
+          <CardContent />
+        </div>
       </HoverCardTrigger>
 
       <HoverCardContent
         side="right"
         align="start"
-        className={`p-4 w-[400px] hidden lg:block ${
-          page == "profile" && "hidden"
-        }`}
+        className={`p-4 w-[400px] z-20`}
       >
         <h1 className="font-semibold">{course.title}</h1>
-        <div className="flex-between my-3">
-          <div className=" flex-between gap-2">
-            <div className="relative w-10 h-10 rounded-full">
-              <Image
-                src={
-                  course.instructor.profilePicture?.url ||
-                  "/default-profile.png"
-                }
-                alt={course.instructor.username}
-                fill
-                className="rounded-full"
-                sizes="40px"
-              />
-            </div>
-            <div className="flex flex-col ">
-              <span className="text-gray-400 text-sm">Course by</span>
-              <p>{course.instructor.username}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <FaStar className="text-orange-400" />
-
-            {averageRatings}
-            <span className="text-gray">({totalRatings})</span>
-          </div>
-        </div>
+        <InstructorInfo instructor={course.instructor} />
         <p className="my-3 text-gray-400">{course.description}</p>
-        <div className="flex items-center gap-3">
-          <Button className="flex-1">Add to cart</Button>
-          <Button>
-            <FaRegHeart />
-          </Button>
-        </div>
-        <HoverCardArrow
-          className="fill-white"
-          style={{
-            position: "absolute",
-            top: "10px", // Adjust as needed
-            left: "10px", // Adjust as needed
-            transform: "translateX(-50%)", // Center the arrow horizontally
-          }}
-        />
+        <CardActions course={course} />
+        {/* <HoverCardArrow className="fill-white absolute top-1/2 -left-2 -mt-1 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-8" /> */}
       </HoverCardContent>
     </HoverCard>
-  ) : (
-    <CardContent />
   );
 };
 

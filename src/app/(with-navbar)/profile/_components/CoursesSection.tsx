@@ -4,11 +4,11 @@ import type { ICourse } from "@/types/course";
 
 interface IProps {
   courses?: ICourse[];
-  pagination?: {
-    totalDocuments: number;
-    currentPage: number;
-    totalPages: number;
-  };
+  // pagination?: {
+  //   totalDocuments: number;
+  //   currentPage: number;
+  //   totalPages: number;
+  // };
 }
 
 const CoursesSection = ({ courses }: IProps) => {

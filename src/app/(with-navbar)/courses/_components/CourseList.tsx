@@ -1,8 +1,9 @@
 import type { ICourseFilterParams } from "@/types/course";
 
 import { getAllCourses } from "@/server/dataFetching/courses";
-import CourseCard from "@/components/course/CourseCard";
 import PaginationButton from "@/components/course/PaginationButton";
+import CourseCard from "@/components/course/CourseCard";
+
 const CourseList = async ({
   initialFilters,
 }: {

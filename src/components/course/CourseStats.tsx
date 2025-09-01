@@ -18,7 +18,7 @@ const CourseStats = ({ course }: CourseStatsProps) => {
   const studentCount = course.enrollmentsCount;
 
   return (
-    <div className="flex-between p-4 pt-3">
+    <div className=" flex-between  px-4 py-3">
       <p className="flex items-center gap-2">
         <FaStar className="text-orange-400" />
         {averageRating || 0}
