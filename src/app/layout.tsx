@@ -15,11 +15,10 @@ import { Toaster } from "@/components/ui/sonner";
 // );
 
 import { ThemeProvider } from "@/components/theme-provider";
-import Header from "@/components/header";
 
 const roboto = Roboto({
   subsets: ["latin"],
-  weight: ["100", "400", "700", "900"],
+  weight: ["100", "400", "500", "700", "900"],
   display: "swap",
   style: ["normal", "italic"],
   variable: "--font-roboto",

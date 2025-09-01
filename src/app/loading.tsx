@@ -1,5 +1,5 @@
 const Loading = () => {
-  return <div className="pt-[100px] font-bold">loading...</div>;
+  return <div className="pt-[100px] font-bold text-center">loading...</div>;
 };
 
 export default Loading;

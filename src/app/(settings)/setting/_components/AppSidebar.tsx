@@ -26,7 +26,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { logout } from "@/server/actions/auth";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 import { useAppSelector } from "@/lib/store/hooks";
 
@@ -99,7 +99,7 @@ const studentItems = [
 export function AppSidebar() {
   const pathname = usePathname();
   const user = useAppSelector((state) => state.auth.user);
-  const router = useRouter();
+
   const items = [
     ...commonItems,
     ...(user?.role === "teacher" ? instructorItems : []),
@@ -108,7 +108,8 @@ export function AppSidebar() {
   const handleLogout = async () => {
     try {
       await logout();
-      router.push("/auth/login");
+
+      window.location.href = "/auth/login";
       // window.location.reload();
     } catch (error) {
       console.log(error);
@@ -121,7 +122,7 @@ export function AppSidebar() {
           <Image
             width={70}
             height={70}
-            src="/new-logo.png"
+            src="/logo.png"
             alt="logo"
             className=" rounded-full"
           />
