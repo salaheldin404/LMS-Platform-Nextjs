@@ -1,7 +1,6 @@
 "use client";
 
 import { useFilterState } from "@/hooks/useFilterState";
-import { useIsMediumScreen } from "@/hooks/useIsMediumScreen";
 import FilterForm from "./FilterForm";
 import { useMediaQuery } from "@uidotdev/usehooks";
 

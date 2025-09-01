@@ -1,6 +1,5 @@
 "use client";
 import CourseList from "./CourseList";
-import { useFilterState } from "@/hooks/useFilterState";
 
 import type { ICourseFilterParams } from "@/types/course";
 
@@ -9,14 +8,7 @@ interface CourseListWrapperProps {
 }
 
 function CourseListWrapper({ initialFilters }: CourseListWrapperProps) {
-  const { uiState } = useFilterState();
-
-  return (
-    <CourseList
-      initialFilters={initialFilters}
-      hideFilters={uiState.hideFilters}
-    />
-  );
+  return <CourseList initialFilters={initialFilters} />;
 }
 
 export default CourseListWrapper;

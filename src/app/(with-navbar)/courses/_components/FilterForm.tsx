@@ -10,9 +10,6 @@ import {
 
 import { Slider } from "@/components/ui/slider";
 
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-
 import FilterCheckboxSection from "./FilterCheckboxSection";
 import { Button } from "@/components/ui/button";
 import { useFilterState } from "@/hooks/useFilterState";

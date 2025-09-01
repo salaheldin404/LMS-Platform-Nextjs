@@ -1,11 +1,10 @@
 "use client";
 import SearchInput from "@/components/common/SearchInput";
-import MobileSearch from "@/components/common/MobileSearch";
 
 import { useCallback, useEffect, useState } from "react";
 import { useFilterState } from "@/hooks/useFilterState";
 import type { TSort } from "@/types/course";
-import { useDebounce, useMediaQuery } from "@uidotdev/usehooks";
+import { useDebounce } from "@uidotdev/usehooks";
 
 import SelectDropdown from "@/components/common/SelectDropdown";
 import {
@@ -32,9 +31,7 @@ const SectionHeader = () => {
   const [localSearch, setLocalSearch] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
   const debouncedSearch = useDebounce(localSearch, 500);
-  const isMedium = useMediaQuery(
-    "only screen and (min-width : 769px) and (max-width : 992px)"
-  );
+
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setLocalSearch(e.target.value);
