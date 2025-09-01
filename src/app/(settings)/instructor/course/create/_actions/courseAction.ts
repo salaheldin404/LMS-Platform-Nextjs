@@ -9,7 +9,7 @@ export interface FormState {
 }
 
 export const createCourse = async (
-  prev,
+  _prev: FormState,
   formData: FormData
 ): Promise<FormState> => {
   const title = formData.get("title");

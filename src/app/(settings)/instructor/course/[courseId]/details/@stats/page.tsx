@@ -9,7 +9,7 @@ const CourseStatsSlot = async ({
 }) => {
   const { courseId } = await params;
   const data = await getCourseStats(courseId);
-  console.log(data, "from stats slot");
+
   return <CourseStatsGrid data={data} />;
 };
 

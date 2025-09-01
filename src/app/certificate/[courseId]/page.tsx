@@ -1,5 +1,6 @@
 "use client";
 import { useGetCertificateForCourseQuery } from "@/lib/store/features/userApiSlice";
+import { TApiError } from "@/types/apiError";
 import { useParams } from "next/navigation";
 const CertificatePage = () => {
   const { courseId } = useParams();
@@ -10,7 +11,7 @@ const CertificatePage = () => {
   if (error) {
     return (
       <div className="main-section text-red-500 text-center text-xl">
-        {error.message || "Something went wrong!"}
+        {(error as TApiError).message || "Something went wrong!"}
       </div>
     );
   }
