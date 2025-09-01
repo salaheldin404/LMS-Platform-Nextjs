@@ -1,9 +1,9 @@
 "use client";
-import { ILesson } from "@/types/course";
+import { ILesson, LessonComplete } from "@/types/course";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useParams, usePathname, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import { markLessonAsComplete } from "@/server/dataFetching/courses";
 
 const LessonItem = ({
@@ -11,7 +11,7 @@ const LessonItem = ({
   completedLessons,
 }: {
   lesson: ILesson;
-  completedLessons: [];
+  completedLessons: LessonComplete[];
 }) => {
   const { lectureId } = useParams();
 

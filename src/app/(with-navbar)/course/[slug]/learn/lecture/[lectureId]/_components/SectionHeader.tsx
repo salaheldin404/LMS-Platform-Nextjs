@@ -4,7 +4,6 @@ import { FaFolderOpen } from "react-icons/fa";
 import { TfiTimer } from "react-icons/tfi";
 import { MdOutlinePlayCircle } from "react-icons/md";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import EditableRatingDialog from "@/components/course/EditableRatingDialog";
 
 const SectionHeader = ({
@@ -12,7 +11,7 @@ const SectionHeader = ({
   nextLectureId,
 }: {
   course: ICourse;
-  nextLectureId?: string;
+  nextLectureId: string | null;
 }) => {
   return (
     <div className="dark:bg-card bg-gray-100 p-4 flex justify-between items-center">

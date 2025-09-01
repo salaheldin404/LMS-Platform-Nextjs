@@ -1,14 +1,27 @@
 import LessonItem from "./LessonItem";
 import { getUserProgressForCourse } from "@/server/dataFetching/courses";
 
-import ChapterAccordion from "@/components/course/ChapterAccordion";
+// import ChapterAccordion from "@/components/course/ChapterAccordion";
 import { APIError } from "@/lib/api/client";
 import { redirect } from "next/navigation";
 import { Progress } from "@/components/ui/progress";
 import CompletedCourseDialog from "./CompletedCourseDialog";
-const CourseSidebar = async ({ course }) => {
+import { ICourse } from "@/types/course";
+
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { MdOutlinePlayCircle } from "react-icons/md";
+import { TfiTimer } from "react-icons/tfi";
+
+const CourseSidebar = async ({ course }: { course: ICourse }) => {
   try {
     const userProgress = await getUserProgressForCourse(course?._id);
+    const completedLessons = userProgress?.completedLessons || [];
+
     return (
       <>
         <div className="">
@@ -26,11 +39,47 @@ const CourseSidebar = async ({ course }) => {
           </div>
           {/* course progresss */}
         </div>
-        <ChapterAccordion
-          completedLessons={userProgress?.completedLessons}
+        <Accordion type="single" collapsible className="w-full">
+          {course.chapters?.map((chapter, index) => (
+            <AccordionItem key={index} value={`chapter-${index}`}>
+              <AccordionTrigger className="px-4 py-3 dark:hover:bg-secondary hover:bg-slate-50">
+                <div className="flex justify-between w-full pr-4">
+                  <div className="text-left">
+                    <span className="font-medium">{chapter.title}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
+                      <MdOutlinePlayCircle className="text-blue-600" />
+                      <span>{chapter.lessons.length} lectures</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <TfiTimer className="text-primary" />
+                      <span className="font-medium">
+                        {chapter.formattedDuration}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="divide-y">
+                  {chapter.lessons.map((lesson, idx) => (
+                    <LessonItem
+                      lesson={lesson}
+                      completedLessons={completedLessons}
+                      key={lesson?._id || idx}
+                    />
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+        {/* <ChapterAccordion
+          completedLessons={completedLessons}
           course={course}
           LessonItem={LessonItem}
-        />
+        /> */}
         <CompletedCourseDialog
           userProgress={userProgress?.progressPercentage}
           courseId={course?._id}

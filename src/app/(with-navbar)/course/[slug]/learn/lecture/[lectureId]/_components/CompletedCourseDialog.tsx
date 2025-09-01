@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useGenerateCertificateMutation } from "@/lib/store/features/courseApiSlice";
 import { useGetCertificateForCourseQuery } from "@/lib/store/features/userApiSlice";
+import { TApiError } from "@/types/apiError";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 const CompletedCourseDialog = ({
@@ -39,7 +40,9 @@ const CompletedCourseDialog = ({
         <Button onClick={handleCertificate} disabled={isLoading}>
           Get Certificate
         </Button>
-        {error && <p className="text-red-500">{error.message}</p>}
+        {error && (
+          <p className="text-red-500">{(error as TApiError).message}</p>
+        )}
       </DialogContent>
     </Dialog>
   );

@@ -1,18 +1,15 @@
-import { getCourseBySlug, getLessonById } from "@/server/dataFetching/courses";
+import { getCourseBySlug } from "@/server/dataFetching/courses";
 import SectionHeader from "./_components/SectionHeader";
 
 import MainContent from "./_components/MainContent";
 import CourseSidebar from "./_components/CourseSidebar";
 import { getActiveSession } from "@/server/actions/auth";
 import { redirect } from "next/navigation";
+import { ICourse } from "@/types/course";
 
-export const preload = (slug: string, lectureId: string) => {
-  void getCourseBySlug(slug);
-  void getLessonById(lectureId);
-};
-
-const getNextLectureId = (course, currentLessonId) => {
-  const allLessons = course.chapters.flatMap((chapter) => chapter.lessons);
+const getNextLectureId = (course: ICourse, currentLessonId: string) => {
+  const allLessons = course?.chapters?.flatMap((chapter) => chapter.lessons);
+  if (!allLessons) return null;
   const currentIndex = allLessons.findIndex(
     (lesson) => lesson._id === currentLessonId
   );
@@ -28,7 +25,6 @@ const LearnPage = async ({
   params: Promise<{ slug: string; lectureId: string }>;
 }) => {
   const { slug, lectureId } = await params;
-  preload(slug, lectureId);
   const [course, user] = await Promise.all([
     getCourseBySlug(slug),
     getActiveSession(),

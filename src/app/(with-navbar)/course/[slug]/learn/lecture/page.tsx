@@ -13,7 +13,6 @@ const LecturePage = async ({
     getActiveSession(),
   ]);
 
-  console.log(user?.createdCourses, "createCOurses");
   if (
     user &&
     course &&
@@ -24,6 +23,9 @@ const LecturePage = async ({
   }
 
   const firstLesson = course?.chapters?.[0]?.lessons[0];
+  if (!firstLesson) {
+    redirect("/");
+  }
   redirect(`/course/${slug}/learn/lecture/${firstLesson?._id}`);
 };
 

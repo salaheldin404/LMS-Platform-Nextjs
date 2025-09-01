@@ -1,19 +1,11 @@
 "use client";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ILesson } from "@/types/course";
+import { ILesson, IVideo } from "@/types/course";
 import { useState } from "react";
 import ReactPlayer from "react-player";
 
 const LessonContent = ({ lesson }: { lesson: ILesson }) => {
   const [error, setError] = useState(false);
-  const options = {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    // timeZone: "UTC",
-    // timeZoneName: "short",
-  };
+  const videoUrl = lesson?.video as IVideo;
   return (
     <div>
       <div className="border-b mb-3 p-2">
@@ -24,7 +16,7 @@ const LessonContent = ({ lesson }: { lesson: ILesson }) => {
             </div>
           ) : (
             <ReactPlayer
-              url={lesson?.video.playbackUrl}
+              url={videoUrl.playbackUrl || ""}
               width="100%"
               height="100%"
               controls={true}
@@ -35,10 +27,11 @@ const LessonContent = ({ lesson }: { lesson: ILesson }) => {
         <h1 className="font-bold my-3 text-xl">{lesson?.title}</h1>
         <p>
           <span className="text-gray-500"> last updated: </span>
-          {new Date(lesson?.updatedAt || "").toLocaleDateString(
-            "en-US",
-            options
-          )}
+          {new Date(lesson?.updatedAt || "").toLocaleDateString("en-US", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+          })}
         </p>
       </div>
       <div>
